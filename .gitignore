@@ -1,0 +1,16 @@
+.idea/
+.vs/
+**/bin/
+**/obj/
+bin/
+obj/
+*/bin
+*/obj/
+*.csproj.user
+**.csproj.user
+*/**.csproj.user
+*/*.csproj.user
+**/*.csproj.user
+**/**.csproj.user
+.DS_Store
+.dist/
