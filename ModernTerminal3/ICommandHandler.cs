@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ModernTerminal3
 {
 	internal interface ICommandHandler {
-		string CommandName {  get; set; }
-		int CommandCalled(string[] arguments);
+		string CommandName { get; }
+		int CommandCalled(string command_name, string[] arguments);
 	}
 }
