@@ -7,13 +7,17 @@ using System.Diagnostics;
 using System.IO;
 using System.ComponentModel;
 using ModernTerminal3.Helpers;
+using ModernTerminal3.WorkEnvironment;
 
 namespace ModernTerminal3 {
 	internal class Terminal {
 		Dictionary<string, ICommandHandler> commands;
+		List<IWorkEnvironment> WorkEnvironments;
 		HashSet<char> escapeableCharacters;
+
 		public Terminal() {
 			commands = new Dictionary<string, ICommandHandler>();
+			WorkEnvironments = new List<IWorkEnvironment>();
 			escapeableCharacters = new HashSet<char>();
 			escapeableCharacters.Add('"');
 			escapeableCharacters.Add('\\');
@@ -23,7 +27,10 @@ namespace ModernTerminal3 {
 		public void Run() {
 			while (true) {
 				PrintPrompt();
-				var input = Console.ReadLine();
+				
+				CommandLineReader commandLineReader = new CommandLineReader();
+				var input = commandLineReader.ReadLine();
+
 				var parsed_input = SplitCommand(input);
 				for (int i = 0; i < parsed_input.Length; i++) {
 					parsed_input[i] = ReplaceVariables(parsed_input[i]);
@@ -39,11 +46,21 @@ namespace ModernTerminal3 {
 			Console.Write($"{GetIdentityString()} {GetLocationString()}");
 
 			EscapeCodeString workEnvironmentString = GetWorkEnvironmentString();
-			if (workEnvironmentString.RealLength == 0) {
+			if (workEnvironmentString == null) {
 				Console.Write("$ ");
 			} else {
 				Console.Write($" {workEnvironmentString}$ ");
 			}
+		}
+
+		private EscapeCodeString GetWorkEnvironmentString() {
+			foreach (IWorkEnvironment workEnvironemnt in WorkEnvironments) {
+				EscapeCodeString thing = workEnvironemnt.GetPromptString();
+				if (thing != null) {
+					return thing;
+				}
+			}
+			return null;
 		}
 
 		private EscapeCodeString GetIdentityString() {
@@ -54,44 +71,12 @@ namespace ModernTerminal3 {
 			return TerminalColors.FGBrightBlue + Directory.GetCurrentDirectory() + TerminalColors.Reset;
 		}
 
-		private EscapeCodeString GetWorkEnvironmentString() {
-			string gitRepoPath = GetGitRepoPath();
-			if (gitRepoPath == null) {
-				return new EscapeCodeString("");
-			}
-			
-			using (GitInterface gitInterface = new GitInterface(gitRepoPath)) {
-				string branchName = gitInterface.GetBranchName();
-				string originUrl = GetRepoName(gitInterface.GetRemoteOrigin());
-				return TerminalColors.FGRed + "(" + originUrl + ":" + branchName + ")" + TerminalColors.Reset;
-			}
-		}
-
-		private string GetRepoName(string originUrl) {
-			string github = "https://github.com/";
-			if (originUrl.StartsWith(github)) {
-				return originUrl.Substring(github.Length, originUrl.Length - github.Length - 4);
-			} else {
-				return originUrl;
-			}
-		}
-
-		private string GetGitRepoPath() {
-			string lastDir = "";
-			string dir = Environment.CurrentDirectory;
-			while (dir != lastDir) {
-
-				if (Directory.Exists(Path.Combine(dir, ".git"))) {
-					return dir;
-				}
-				lastDir = dir;
-				dir = Path.GetFullPath(Path.Combine(dir, ".."));
-			}
-			return null;
-		}
-
 		public void AddCommand(ICommandHandler command) {
 			commands.Add(command.CommandName, command);
+		}
+
+		public void AddWorkEnvironment(IWorkEnvironment workEnvironment) {
+			WorkEnvironments.Add(workEnvironment);
 		}
 
 		int HandleCommand(string command_name, string[] args) {
