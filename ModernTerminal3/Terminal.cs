@@ -16,12 +16,6 @@ namespace ModernTerminal3 {
 		List<IWorkEnvironment> WorkEnvironments;
 		HashSet<char> escapeableCharacters;
 
-		[DllImport("kernel32.dll")]
-		private static extern void SetConsoleMode(IntPtr hConsoleHandle, int dwMode);
-		
-		[DllImport("kernel32.dll")]
-		private static extern IntPtr GetStdHandle(int nStdHandle);
-
 		public Terminal() {
 			commands = new Dictionary<string, ICommandHandler>();
 			WorkEnvironments = new List<IWorkEnvironment>();
@@ -53,9 +47,7 @@ namespace ModernTerminal3 {
 		}
 
 		private void SetCorrectConsoleMode() {
-			IntPtr handle = GetStdHandle(-11);
-
-			SetConsoleMode(handle, 1 | 4);
+			NativeConsoleOperation.OutConsoleMode = ConsoleInMode.ENABLE_PROCESSED_INPUT | ConsoleInMode.ENABLE_ECHO_INPUT;
 		}
 
 		private void PrintPrompt() {
