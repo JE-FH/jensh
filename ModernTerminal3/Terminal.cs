@@ -8,12 +8,19 @@ using System.IO;
 using System.ComponentModel;
 using ModernTerminal3.Helpers;
 using ModernTerminal3.WorkEnvironment;
+using System.Runtime.InteropServices;
 
 namespace ModernTerminal3 {
 	internal class Terminal {
 		Dictionary<string, ICommandHandler> commands;
 		List<IWorkEnvironment> WorkEnvironments;
 		HashSet<char> escapeableCharacters;
+
+		[DllImport("kernel32.dll")]
+		private static extern void SetConsoleMode(IntPtr hConsoleHandle, int dwMode);
+		
+		[DllImport("kernel32.dll")]
+		private static extern IntPtr GetStdHandle(int nStdHandle);
 
 		public Terminal() {
 			commands = new Dictionary<string, ICommandHandler>();
@@ -26,6 +33,9 @@ namespace ModernTerminal3 {
 
 		public void Run() {
 			while (true) {
+				//Make sure that the console mode is correct and hasnt been changed by a command
+				SetCorrectConsoleMode();
+
 				PrintPrompt();
 				
 				CommandLineReader commandLineReader = new CommandLineReader();
@@ -40,6 +50,12 @@ namespace ModernTerminal3 {
 					HandleCommand(parsed_input[0], parsed_input.AsSpan(1).ToArray());
 				}
 			}
+		}
+
+		private void SetCorrectConsoleMode() {
+			IntPtr handle = GetStdHandle(-11);
+
+			SetConsoleMode(handle, 1 | 4);
 		}
 
 		private void PrintPrompt() {
