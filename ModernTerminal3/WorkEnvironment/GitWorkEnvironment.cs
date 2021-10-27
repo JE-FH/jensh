@@ -19,7 +19,8 @@ namespace ModernTerminal3.WorkEnvironment {
 			using (GitInterface gitInterface = new GitInterface(gitRepoPath)) {
 				string branchName = gitInterface.GetBranchName();
 				string originUrl = GetRepoName(gitInterface.GetRemoteOrigin());
-				return TerminalColors.FGRed + "(" + originUrl + ":" + branchName + ")" + TerminalColors.Reset;
+                ChangesState changes = gitInterface.GetChanges();
+				return TerminalColors.FGBrightRed + "(" + originUrl + ":" + branchName + ") " + TerminalColors.FGBrightWhite + $"({changes.NewFiles}➕{changes.DeletedFiles}❌{changes.Modified}🔧)" + TerminalColors.Reset;
 			}
 		}
 

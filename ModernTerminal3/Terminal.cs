@@ -48,16 +48,16 @@ namespace ModernTerminal3 {
 
 		private void SetCorrectConsoleMode() {
 			NativeConsoleOperation.OutConsoleMode = ConsoleInMode.ENABLE_PROCESSED_INPUT | ConsoleInMode.ENABLE_ECHO_INPUT;
+			NativeConsoleOperation.SetOutputConsoleCP(65001);
 		}
 
 		private void PrintPrompt() {
-			Console.Write($"{GetIdentityString()} {GetLocationString()}");
 
 			EscapeCodeString workEnvironmentString = GetWorkEnvironmentString();
-			if (workEnvironmentString == null) {
-				Console.Write("$ ");
+			if (workEnvironmentString.RealLength == 0) {
+				Console.Write($"{GetIdentityString()} {GetLocationString()}$ ");
 			} else {
-				Console.Write($" {workEnvironmentString}$ ");
+				Console.Write($"{workEnvironmentString} {GetLocationString()}$ ");
 			}
 		}
 

@@ -36,6 +36,9 @@ namespace ModernTerminal3 {
 		[DllImport("kernel32.dll", EntryPoint = "GetConsoleMode")]
 		private unsafe static extern bool NativeGetConsoleMode(IntPtr hConsoleHandle, int* dwMode);
 
+		[DllImport("kernel32.dll", EntryPoint = "SetConsoleOutputCP")]
+		public static extern bool SetOutputConsoleCP(uint wCodePageID);
+
 		private static IntPtr _outHandle = IntPtr.Zero;
 		private static IntPtr _inHandle = IntPtr.Zero;
 
@@ -88,6 +91,5 @@ namespace ModernTerminal3 {
 				NativeSetConsoleMode(InHandle, value);
 			}
 		}
-
 	}
 }
