@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ModernTerminal3": {
+      "commandName": "Project",
+      "jsWebView2Debugging": false,
+      "nativeDebugging": false
+    }
+  }
+}

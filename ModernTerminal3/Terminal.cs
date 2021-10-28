@@ -11,10 +11,18 @@ using ModernTerminal3.WorkEnvironment;
 using System.Runtime.InteropServices;
 
 namespace ModernTerminal3 {
-	internal class Terminal {
+	struct CommandSplitInfo {
+		public string ParsedData;
+		public string RawData;
+		public int StartIndex;
+		public int EndIndex;
+	}
+
+	internal class Terminal : ITerminalReaderInfoProvider {
 		Dictionary<string, ICommandHandler> commands;
 		List<IWorkEnvironment> WorkEnvironments;
 		HashSet<char> escapeableCharacters;
+		List<string> _commandHistory;
 
 		public Terminal() {
 			commands = new Dictionary<string, ICommandHandler>();
@@ -23,6 +31,7 @@ namespace ModernTerminal3 {
 			escapeableCharacters.Add('"');
 			escapeableCharacters.Add('\\');
 			escapeableCharacters.Add(' ');
+			_commandHistory = new List<string>();
 		}
 
 		public void Run() {
@@ -32,8 +41,9 @@ namespace ModernTerminal3 {
 
 				PrintPrompt();
 				
-				CommandLineReader commandLineReader = new CommandLineReader();
+				TerminalReader commandLineReader = new TerminalReader(this);
 				var input = commandLineReader.ReadLine();
+
 
 				var parsed_input = SplitCommand(input);
 				for (int i = 0; i < parsed_input.Length; i++) {
@@ -42,6 +52,12 @@ namespace ModernTerminal3 {
 
 				if (parsed_input.Length > 0) {
 					HandleCommand(parsed_input[0], parsed_input.AsSpan(1).ToArray());
+					if (
+						_commandHistory.Count == 0 || 
+						_commandHistory[^1] != input
+					) {
+						_commandHistory.Add(input);
+					}
 				}
 			}
 		}
@@ -106,13 +122,17 @@ namespace ModernTerminal3 {
 			return proc.ExitCode;
 		}
 
-		string[] SplitCommand(string command_input) {
+		CommandSplitInfo[] SplitCommand(string command_input) {
 			bool escaped = false;
 			bool in_string = false;
 			string acc = "";
-			List<string> rv = new();
-			foreach (char c in command_input) {
+			string rawAcc = "";
+			int startIndex = 0;
+			List<CommandSplitInfo> rv = new();
+			for (int i = 0; i < command_input.Length; i++) {
+				char c = command_input[i];
 				if (escaped) {
+					rawAcc += c;
 					if (escapeableCharacters.Contains(c)) {
 						acc += c;
 					} else {
@@ -122,28 +142,45 @@ namespace ModernTerminal3 {
 					escaped = false;
 				} else {
 					if (c == '"') {
+						rawAcc += c;
 						if (in_string) {
 							in_string = false;
 						} else {
 							in_string = true;
 						}
 					} else if (c == ' ' && !in_string) {
-						if (acc.Length > 0) {
-							rv.Add(acc);
+						if (rawAcc.Length > 0) {
+							rv.Add(new CommandSplitInfo() {
+								ParsedData = acc,
+								RawData = rawAcc,
+								StartIndex = startIndex,
+								EndIndex = i
+							}) ;
+							startIndex = i+1;
 							acc = "";
+							rawAcc = "";
 						}
 					} else if (c == '\\') {
+						rawAcc += c;
 						escaped = true;
 					} else {
+						rawAcc += c;
 						acc += c;
 					}
 				}
 			}
-			if (acc.Length > 0) {
-				rv.Add(acc);
+			if (rawAcc.Length > 0) {
+				rv.Add(new CommandSplitInfo() {
+					ParsedData = acc,
+					RawData = rawAcc,
+					StartIndex = startIndex,
+					EndIndex = command_input.Length
+				});
 			}
 			return rv.ToArray();
 		}
+
+		
 		
 		string ReplaceVariables(string arg_str) {
 			string rv = "";
@@ -182,6 +219,17 @@ namespace ModernTerminal3 {
 
 		string GetVarValue(string var_name) {
 			return Environment.GetEnvironmentVariable(var_name);
+		}
+
+		public string TabComplete(string currentInput) {
+			return currentInput;
+		}
+
+		public string GetLastCommand(int offset) {
+			if (_commandHistory.Count + offset >= 0 && _commandHistory.Count + offset + offset < _commandHistory.Count) {
+				return _commandHistory[_commandHistory.Count + offset];
+			}
+			return null;
 		}
 	}
 }
