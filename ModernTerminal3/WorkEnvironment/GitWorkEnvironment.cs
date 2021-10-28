@@ -20,7 +20,15 @@ namespace ModernTerminal3.WorkEnvironment {
 				string branchName = gitInterface.GetBranchName();
 				string originUrl = GetRepoName(gitInterface.GetRemoteOrigin());
                 ChangesState changes = gitInterface.GetChanges();
-				return TerminalColors.FGBrightRed + "(" + originUrl + ":" + branchName + ") " + TerminalColors.FGBrightWhite + $"({changes.NewFiles}➕{changes.DeletedFiles}❌{changes.Modified}🔧)" + TerminalColors.Reset;
+				string changesStr;
+				if (changes.DeletedFiles == 0 && changes.NewFiles == 0 && changes.Modified == 0)
+                {
+					changesStr = "(no changes)";
+                } else
+                {
+					changesStr = $"({changes.NewFiles}➕{changes.DeletedFiles}❌{changes.Modified}🔧)";
+				}
+				return TerminalColors.FGBrightRed + "(" + originUrl + ":" + branchName + ") " + TerminalColors.FGBrightWhite + changesStr + TerminalColors.Reset;
 			}
 		}
 
