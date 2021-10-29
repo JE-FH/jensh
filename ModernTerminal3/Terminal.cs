@@ -11,7 +11,7 @@ using ModernTerminal3.WorkEnvironment;
 using System.Runtime.InteropServices;
 
 namespace ModernTerminal3 {
-	struct CommandSplitInfo {
+	class CommandSplitInfo {
 		public string ParsedData;
 		public string RawData;
 		public int StartIndex;
@@ -46,12 +46,10 @@ namespace ModernTerminal3 {
 
 
 				var parsed_input = SplitCommand(input);
-				for (int i = 0; i < parsed_input.Length; i++) {
-					parsed_input[i] = ReplaceVariables(parsed_input[i]);
-				}
+				var finished_parts = ExtractAndFinishCommandParts(parsed_input);
 
 				if (parsed_input.Length > 0) {
-					HandleCommand(parsed_input[0], parsed_input.AsSpan(1).ToArray());
+					HandleCommand(finished_parts[0], finished_parts.Skip(1).ToArray());
 					if (
 						_commandHistory.Count == 0 || 
 						_commandHistory[^1] != input
@@ -180,7 +178,12 @@ namespace ModernTerminal3 {
 			return rv.ToArray();
 		}
 
-		
+		string[] ExtractAndFinishCommandParts(IEnumerable<CommandSplitInfo> commandSplitInfo) {
+			//This might make it possible to get environment variables by %"varname"% so %"APPDATA"% would work
+			return commandSplitInfo
+				.Where((info) => info.ParsedData.Length > 0)
+				.Select((info) => ReplaceVariables(info.ParsedData)).ToArray();
+		}
 		
 		string ReplaceVariables(string arg_str) {
 			string rv = "";
@@ -221,8 +224,71 @@ namespace ModernTerminal3 {
 			return Environment.GetEnvironmentVariable(var_name);
 		}
 
-		public string TabComplete(string currentInput) {
-			return currentInput;
+		public (string newData, int newOffset) TabComplete(string currentInput, int offset) {
+			CommandSplitInfo[] commandInfo = SplitCommand(currentInput);
+
+			CommandSplitInfo selectedPart = null;
+			int selectedPartOffset = 0;
+
+
+			int currentOffset = 0;
+			foreach (CommandSplitInfo part in commandInfo) {
+				if (part.StartIndex <= offset && part.EndIndex >= offset) {
+					selectedPart = part;
+					selectedPartOffset = offset - part.StartIndex;
+					break;
+				}
+				currentOffset = part.EndIndex;
+			}
+			if (selectedPart == null) {
+				return (null, offset);
+			}
+
+			string realPath = MakePathAbsolute(ReplaceVariables(selectedPart.ParsedData));
+			int newOffset = 0;
+			if (Path.EndsInDirectorySeparator(realPath) && Directory.Exists(realPath)) {
+				string[] result = Directory.EnumerateFileSystemEntries(realPath).Take(1).ToArray();
+				if (result.Length == 0) {
+					return (null, offset);
+				}
+
+				string joiningPath = Path.GetFileName(result[0]);
+				if (Directory.Exists(result[0])) {
+					joiningPath += "/";
+				}
+
+				selectedPart.RawData = Path.Join(selectedPart.ParsedData, joiningPath);
+				newOffset = selectedPart.StartIndex + selectedPart.RawData.Length;
+			} else if (Directory.Exists(Path.Join(realPath, ".."))) {
+				var searchDir = Path.Join(realPath, "..");
+				var pattern = Path.GetFileName(realPath) + "*";
+				var result = Directory.GetFileSystemEntries(searchDir, pattern).Take(1).ToArray();
+				
+				if (result.Length == 0) {
+					//TODO: add bell
+					return (null, offset);
+				}
+
+				string joiningPath = Path.GetFileName(result[0]);
+				if (Directory.Exists(result[0])) {
+					joiningPath += "/";
+				}
+
+				selectedPart.RawData = selectedPart.ParsedData + joiningPath[Path.GetFileName(realPath).Length..^0];
+				newOffset = selectedPart.StartIndex + selectedPart.RawData.Length;
+			} else {
+				return (null, offset);
+			}
+
+			return (string.Join(" ", commandInfo.Select((info) => info.RawData)), newOffset);
+		}
+
+		string MakePathAbsolute(string givenPath) {
+			if (Path.IsPathRooted(givenPath)) {
+				return givenPath;
+			} else {
+				return Path.GetFullPath(Path.Join(Environment.CurrentDirectory, givenPath));
+			}
 		}
 
 		public string GetLastCommand(int offset) {

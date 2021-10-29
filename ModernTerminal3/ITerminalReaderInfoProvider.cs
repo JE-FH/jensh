@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModernTerminal3 {
 	interface ITerminalReaderInfoProvider {
-		string TabComplete(string currentInput);
+		(string newData, int newOffset) TabComplete(string currentInput, int offset);
 		
 		string GetLastCommand(int offset);
 

@@ -62,7 +62,11 @@ namespace ModernTerminal3 {
 							_cursorOffset += 1;
 						}
 					} else if (keyInfo.Key == ConsoleKey.Tab) {
-						_acc = _terminalReaderInfoProvider.TabComplete(_acc);
+						(string completion, int newOffset) = _terminalReaderInfoProvider.TabComplete(_acc, _cursorOffset);
+						if (completion != null) {
+							_acc = completion;
+							_cursorOffset = newOffset;
+						}
 					} else if (keyInfo.Key == ConsoleKey.UpArrow) {
 						string lastCommand = _terminalReaderInfoProvider.GetLastCommand(_currentCommandHistoryIndex - 1);
 						if (lastCommand != null) {
