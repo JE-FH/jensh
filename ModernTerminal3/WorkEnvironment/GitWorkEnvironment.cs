@@ -18,8 +18,17 @@ namespace ModernTerminal3.WorkEnvironment {
 
 			using (GitInterface gitInterface = new GitInterface(gitRepoPath)) {
 				string branchName = gitInterface.GetBranchName();
-				string originUrl = GetRepoName(gitInterface.GetRemoteOrigin());
-                ChangesState changes = gitInterface.GetChanges();
+				string originUrl;
+				string remoteOrigin = gitInterface.GetRemoteOrigin();
+				if (remoteOrigin == null) {
+					originUrl = "(no remote)";
+				} else {
+					originUrl = GetRepoName(remoteOrigin);
+				}
+				if (branchName == null) {
+					branchName = "(no branch)";
+                }
+				ChangesState changes = gitInterface.GetChanges();
 				string changesStr;
 				if (changes.DeletedFiles == 0 && changes.NewFiles == 0 && changes.Modified == 0)
                 {

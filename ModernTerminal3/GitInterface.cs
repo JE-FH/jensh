@@ -37,7 +37,7 @@ namespace ModernTerminal3 {
 		} 
 
 		public string GetRemoteOrigin() {
-			return Repo.Config.Get<string>("remote.origin.url").Value;
+			return Repo.Config.Get<string>("remote.origin.url")?.Value;
 		}
 
 		public ChangesState GetChanges()
