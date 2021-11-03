@@ -10,7 +10,7 @@ namespace ModernTerminal3.Commands {
 	class ExternalProgramCommand : ICommandHandler {
 		public string CommandName => "EPC";
 
-		public ExternalProgramCommand() {}
+		public ExternalProgramCommand() { }
 
 		public int CommandCalled(string command_name, string[] arguments) {
 			if (arguments.Length < 1) {
@@ -25,7 +25,7 @@ namespace ModernTerminal3.Commands {
 			string[] possible_paths = null;
 
 			if (Path.IsPathRooted(arguments[0])) {
-				possible_paths = new string[] {arguments[0]};
+				possible_paths = new string[] { arguments[0] };
 			} else {
 				possible_paths = GetPossiblePaths(arguments[0]);
 			}

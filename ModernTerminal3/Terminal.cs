@@ -40,7 +40,7 @@ namespace ModernTerminal3 {
 				SetCorrectConsoleMode();
 
 				PrintPrompt();
-				
+
 				TerminalReader commandLineReader = new TerminalReader(this);
 				var input = commandLineReader.ReadLine();
 
@@ -51,7 +51,7 @@ namespace ModernTerminal3 {
 				if (parsed_input.Length > 0) {
 					HandleCommand(finished_parts[0], finished_parts.Skip(1).ToArray());
 					if (
-						_commandHistory.Count == 0 || 
+						_commandHistory.Count == 0 ||
 						_commandHistory[^1] != input
 					) {
 						_commandHistory.Add(input);
@@ -153,8 +153,8 @@ namespace ModernTerminal3 {
 								RawData = rawAcc,
 								StartIndex = startIndex,
 								EndIndex = i
-							}) ;
-							startIndex = i+1;
+							});
+							startIndex = i + 1;
 							acc = "";
 							rawAcc = "";
 						}
@@ -184,7 +184,7 @@ namespace ModernTerminal3 {
 				.Where((info) => info.ParsedData.Length > 0)
 				.Select((info) => ReplaceVariables(info.ParsedData)).ToArray();
 		}
-		
+
 		string ReplaceVariables(string arg_str) {
 			string rv = "";
 			string acc = "";
@@ -263,7 +263,7 @@ namespace ModernTerminal3 {
 				var searchDir = Path.Join(realPath, "..");
 				var pattern = Path.GetFileName(realPath) + "*";
 				var result = Directory.GetFileSystemEntries(searchDir, pattern).Take(1).ToArray();
-				
+
 				if (result.Length == 0) {
 					//TODO: add bell
 					return (null, offset);

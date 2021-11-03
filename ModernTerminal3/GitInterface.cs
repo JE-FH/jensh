@@ -8,12 +8,11 @@ using System.IO;
 using LibGit2Sharp;
 
 namespace ModernTerminal3 {
-	struct ChangesState
-    {
+	struct ChangesState {
 		public int Modified;
 		public int NewFiles;
 		public int DeletedFiles;
-    }
+	}
 
 	class GitInterface : IDisposable {
 		Repository Repo;
@@ -34,23 +33,20 @@ namespace ModernTerminal3 {
 				}
 			}
 			return null;
-		} 
+		}
 
 		public string GetRemoteOrigin() {
 			return Repo.Config.Get<string>("remote.origin.url")?.Value;
 		}
 
-		public ChangesState GetChanges()
-        {
-			ChangesState rv = new ChangesState()
-			{
+		public ChangesState GetChanges() {
+			ChangesState rv = new ChangesState() {
 				Modified = 0,
 				NewFiles = 0,
 				DeletedFiles = 0,
 			};
 			foreach (StatusEntry statusEntry in Repo.RetrieveStatus()) {
-				switch (statusEntry.State)
-                {
+				switch (statusEntry.State) {
 					case FileStatus.DeletedFromWorkdir:
 						rv.DeletedFiles++;
 						break;
@@ -61,9 +57,9 @@ namespace ModernTerminal3 {
 					case FileStatus.NewInWorkdir:
 						rv.NewFiles++;
 						break;
-                }
-            }
+				}
+			}
 			return rv;
-        }
+		}
 	}
 }

@@ -9,7 +9,7 @@ namespace ModernTerminal3.Commands {
 	class MakeDirectoryCommand : ICommandHandler {
 		public string CommandName => "mkdir";
 
-		public MakeDirectoryCommand() {}
+		public MakeDirectoryCommand() { }
 
 		public int CommandCalled(string command_name, string[] arguments) {
 			if (arguments.Length != 1) {

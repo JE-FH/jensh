@@ -1,11 +1,8 @@
 ﻿using System;
 
-namespace ModernTerminal3
-{
-	internal class Program
-	{
-		static void Main(string[] args)
-		{
+namespace ModernTerminal3 {
+	internal class Program {
+		static void Main(string[] args) {
 			Terminal terminal = new();
 			terminal.AddCommand(new Commands.EchoCommand());
 			terminal.AddCommand(new Commands.ExternalProgramCommand());

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ModernTerminal3.Commands {
 	class DelCommand : ICommandHandler {
 		public string CommandName => "rm";
-		
+
 		public DelCommand() {
 
 		}
@@ -17,7 +17,7 @@ namespace ModernTerminal3.Commands {
 
 		public int CommandCalled(string command_name, string[] _arguments) {
 			List<string> arguments = new List<string>(_arguments);
-			
+
 			HashSet<char> switches = new HashSet<char>();
 
 			for (int i = arguments.Count - 1; i >= 0; i--) {

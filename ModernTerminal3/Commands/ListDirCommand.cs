@@ -34,8 +34,8 @@ namespace ModernTerminal3.Commands {
 			} else {
 				stylizedName = new EscapeCodeString(name);
 			}
-			return new EscapeCodeString[] { 
-				new EscapeCodeString(attributes), 
+			return new EscapeCodeString[] {
+				new EscapeCodeString(attributes),
 				new EscapeCodeString(size),
 				new EscapeCodeString(lastChange),
 				stylizedName
@@ -49,7 +49,7 @@ namespace ModernTerminal3.Commands {
 		public int CommandCalled(string command_name, string[] arguments) {
 			var dirInfo = new DirectoryInfo(Environment.CurrentDirectory);
 			List<FileSystemEntryData> entries = new();
-			
+
 			foreach (var entryInfo in dirInfo.EnumerateDirectories()) {
 				entries.Add(new FileSystemEntryData(
 					"",
@@ -59,7 +59,7 @@ namespace ModernTerminal3.Commands {
 					entryInfo.Name
 				));
 			}
-			
+
 			foreach (var entryInfo in dirInfo.EnumerateFiles()) {
 				entries.Add(new FileSystemEntryData(
 					"",

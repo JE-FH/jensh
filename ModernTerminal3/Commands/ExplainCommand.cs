@@ -8,7 +8,7 @@ namespace ModernTerminal3.Commands {
 	class ExplainCommand : ICommandHandler {
 		public string CommandName => "explain";
 
-		public ExplainCommand() {}
+		public ExplainCommand() { }
 
 		public int CommandCalled(string command_name, string[] arguments) {
 			Console.WriteLine($"Got {arguments.Length} arguments");

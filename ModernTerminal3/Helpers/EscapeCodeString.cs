@@ -19,7 +19,7 @@ namespace ModernTerminal3.Helpers {
 			Data = data;
 		}
 
-		public static EscapeCodeString operator+(EscapeCodeString a, EscapeCodeString b) {
+		public static EscapeCodeString operator +(EscapeCodeString a, EscapeCodeString b) {
 			return new EscapeCodeString(a.RealLength + b.RealLength, a.Data + b.Data);
 		}
 

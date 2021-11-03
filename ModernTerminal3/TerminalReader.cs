@@ -81,6 +81,10 @@ namespace ModernTerminal3 {
 							_acc = lastCommand;
 							_cursorOffset = _acc.Length;
 						}
+					} else if (keyInfo.Key == ConsoleKey.C && keyInfo.Modifiers.HasFlag(ConsoleModifiers.Control)) {
+						ReprintInput(_acc, _acc + "^C");
+						_acc = "";
+						break;
 					}
 				}
 
@@ -88,7 +92,7 @@ namespace ModernTerminal3 {
 			}
 
 			Console.WriteLine();
-	
+
 			NativeConsoleOperation.InConsoleMode = oldInMode;
 			NativeConsoleOperation.OutConsoleMode = oldOutMode;
 			return _acc;
@@ -105,7 +109,7 @@ namespace ModernTerminal3 {
 			}
 
 			if (newInput.Length < lastInput.Length) {
-				for (int i = 0; i < (lastInput.Length -  newInput.Length); i++) {
+				for (int i = 0; i < (lastInput.Length - newInput.Length); i++) {
 					Console.Write(" ");
 				}
 			}

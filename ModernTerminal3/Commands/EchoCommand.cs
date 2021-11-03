@@ -8,7 +8,7 @@ namespace ModernTerminal3.Commands {
 	class EchoCommand : ICommandHandler {
 		public string CommandName { get => "echo"; }
 
-		public EchoCommand() {}
+		public EchoCommand() { }
 
 		public int CommandCalled(string command_name, string[] arguments) {
 			for (int i = 0; i < arguments.Length; i++) {

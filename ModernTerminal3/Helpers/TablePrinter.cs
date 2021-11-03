@@ -13,7 +13,7 @@ namespace ModernTerminal3.Helpers {
 		}
 
 		public void PrintTable(PrintableTableDescription tableDesc, IPrintableTableRow[] rows) {
-			
+
 			List<int> columnsLengths = new();
 
 			for (int i = 0; i < tableDesc.ColumnHeaders.Length; i++) {
@@ -21,8 +21,8 @@ namespace ModernTerminal3.Helpers {
 			}
 
 			var columnCount = columnsLengths.Count;
-			
-			foreach(IPrintableTableRow row in rows) {
+
+			foreach (IPrintableTableRow row in rows) {
 				EscapeCodeString[] rowColumns = row.GetStylizedColumns();
 
 				if (rowColumns.Length != columnCount) {
@@ -40,7 +40,7 @@ namespace ModernTerminal3.Helpers {
 				Console.Write(tableDesc.ColumnHeaders[i].Data);
 				Console.Write(new string(' ', columnsLengths[i] - tableDesc.ColumnHeaders[i].RealLength));
 			}
-			
+
 			Console.WriteLine();
 
 			for (int i = 0; i < tableDesc.ColumnHeaders.Length; i++) {
@@ -49,7 +49,7 @@ namespace ModernTerminal3.Helpers {
 				}
 				Console.Write(new string('-', columnsLengths[i]));
 			}
-			
+
 			Console.WriteLine();
 
 			foreach (IPrintableTableRow row in rows) {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModernTerminal3.WorkEnvironment {
 	class GitWorkEnvironment : IWorkEnvironment {
-		public GitWorkEnvironment() {}
+		public GitWorkEnvironment() { }
 
 		public EscapeCodeString GetPromptString() {
 			string gitRepoPath = GetGitRepoPath();
@@ -27,14 +27,12 @@ namespace ModernTerminal3.WorkEnvironment {
 				}
 				if (branchName == null) {
 					branchName = "(no branch)";
-                }
+				}
 				ChangesState changes = gitInterface.GetChanges();
 				string changesStr;
-				if (changes.DeletedFiles == 0 && changes.NewFiles == 0 && changes.Modified == 0)
-                {
+				if (changes.DeletedFiles == 0 && changes.NewFiles == 0 && changes.Modified == 0) {
 					changesStr = "(no changes)";
-                } else
-                {
+				} else {
 					changesStr = $"({changes.NewFiles}➕{changes.DeletedFiles}❌{changes.Modified}🔧)";
 				}
 				return TerminalColors.FGBrightRed + "(" + originUrl + ":" + branchName + ") " + TerminalColors.FGBrightWhite + changesStr + TerminalColors.Reset;

@@ -26,4 +26,12 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\gamer\source\repos\ModernTerminal3\ModernTerminal3\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="C:\Users\gamer\source\repos\ModernTerminal3\ModernTerminal3\.editorconfig" />
+  </ItemGroup>
+
 </Project>
