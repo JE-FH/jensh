@@ -72,12 +72,14 @@ namespace ModernTerminal3 {
 						if (lastCommand != null) {
 							_currentCommandHistoryIndex--;
 							_acc = lastCommand;
+							_cursorOffset = _acc.Length;
 						}
 					} else if (keyInfo.Key == ConsoleKey.DownArrow) {
 						string lastCommand = _terminalReaderInfoProvider.GetLastCommand(_currentCommandHistoryIndex + 1);
 						if (lastCommand != null) {
 							_currentCommandHistoryIndex++;
 							_acc = lastCommand;
+							_cursorOffset = _acc.Length;
 						}
 					}
 				}
