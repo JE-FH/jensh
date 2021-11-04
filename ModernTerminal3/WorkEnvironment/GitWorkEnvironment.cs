@@ -35,7 +35,7 @@ namespace ModernTerminal3.WorkEnvironment {
 				} else {
 					changesStr = $"({changes.NewFiles}➕{changes.DeletedFiles}❌{changes.Modified}🔧)";
 				}
-				return TerminalColors.FGBrightRed + "(" + originUrl + ":" + branchName + ") " + TerminalColors.FGBrightWhite + changesStr + TerminalColors.Reset;
+				return TerminalColors.FGBrightMagenta + "(" + originUrl + ":" + branchName + ") " + TerminalColors.FGBrightWhite + changesStr + TerminalColors.Reset;
 			}
 		}
 
