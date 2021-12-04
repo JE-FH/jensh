@@ -70,6 +70,8 @@ namespace ModernTerminal3.Helpers {
 		public static readonly EscapeCodeString FGBrightCyan = new EscapeCodeString(0, "\x1b[96m");
 		public static readonly EscapeCodeString FGBrightWhite = new EscapeCodeString(0, "\x1b[97m");
 
+		public static readonly EscapeCodeString Bold = new EscapeCodeString(0, "\x1b[1m");
+
 		public static readonly EscapeCodeString Reset = new EscapeCodeString(0, "\x1b[0m");
 	}
 }

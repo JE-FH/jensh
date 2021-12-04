@@ -29,13 +29,16 @@ namespace ModernTerminal3.WorkEnvironment {
 					branchName = "(no branch)";
 				}
 				ChangesState changes = gitInterface.GetChanges();
-				string changesStr;
+				EscapeCodeString changesStr;
 				if (changes.DeletedFiles == 0 && changes.NewFiles == 0 && changes.Modified == 0) {
-					changesStr = "(no changes)";
+					changesStr = new EscapeCodeString("staged");
 				} else {
-					changesStr = $"({changes.NewFiles}➕{changes.DeletedFiles}❌{changes.Modified}🔧)";
+					changesStr = new EscapeCodeString("") + 
+						changes.NewFiles.ToString() + TerminalColors.Bold + TerminalColors.FGGreen + "+ " +
+						TerminalColors.Reset + changes.DeletedFiles.ToString() + TerminalColors.Bold + TerminalColors.FGRed + "- " +
+						TerminalColors.Reset + changes.Modified.ToString() + TerminalColors.Bold + TerminalColors.FGYellow + "~";
 				}
-				return TerminalColors.FGBrightMagenta + "(" + originUrl + ":" + branchName + ") " + TerminalColors.FGBrightWhite + changesStr + TerminalColors.Reset;
+				return TerminalColors.FGBrightMagenta + originUrl + ":" + branchName + " " + TerminalColors.FGBrightWhite + changesStr + TerminalColors.Reset;
 			}
 		}
 
