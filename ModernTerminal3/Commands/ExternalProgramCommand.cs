@@ -38,6 +38,8 @@ namespace ModernTerminal3.Commands {
 			var proc = Process.Start(first_executeable, real_arguments);
 			Console.CancelKeyPress += Console_IgnoreCancelKey;
 			proc.WaitForExit();
+			while (Console.KeyAvailable)
+				Console.ReadKey(true);
 			Console.CancelKeyPress -= Console_IgnoreCancelKey;
 			return proc.ExitCode;
 		}
