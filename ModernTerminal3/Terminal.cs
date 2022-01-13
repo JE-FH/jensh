@@ -23,6 +23,7 @@ namespace ModernTerminal3 {
 		List<IWorkEnvironment> WorkEnvironments;
 		HashSet<char> escapeableCharacters;
 		List<string> _commandHistory;
+		public ICommandHandler DefaultCommandHandler { get; set; }
 
 		public Terminal() {
 			commands = new Dictionary<string, ICommandHandler>();
@@ -90,7 +91,12 @@ namespace ModernTerminal3 {
 		}
 
 		private EscapeCodeString GetLocationString() {
-			return TerminalColors.FGBrightBlue + Directory.GetCurrentDirectory() + TerminalColors.Reset;
+			var currentDirectory = Directory.GetCurrentDirectory();
+			var home_directory = GetVarValue("USERPROFILE");
+			if (home_directory != null) {
+				currentDirectory = currentDirectory.Replace(home_directory, "~");
+			}
+			return TerminalColors.FGBrightBlue + currentDirectory + TerminalColors.Reset;
 		}
 
 		public void AddCommand(ICommandHandler command) {
@@ -115,9 +121,7 @@ namespace ModernTerminal3 {
 			}
 		}
 		int CallExternalProgram(string command_name, string[] args) {
-			var proc = Process.Start(command_name, args);
-			proc.WaitForExit();
-			return proc.ExitCode;
+			return DefaultCommandHandler.CommandCalled(command_name, (new string[] { command_name }).Concat(args).ToArray());
 		}
 
 		CommandSplitInfo[] SplitCommand(string command_input) {
@@ -207,6 +211,13 @@ namespace ModernTerminal3 {
 				} else {
 					if (c == '%') {
 						inside_var = true;
+					} else if (c == '~') {
+						var var_val = GetVarValue("USERPROFILE");
+						if (var_val != null) {
+							rv += var_val;
+						} else {
+							rv += "~";
+						}
 					} else {
 						rv += c;
 					}
