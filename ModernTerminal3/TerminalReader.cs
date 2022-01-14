@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ModernTerminal3 {
 	class TerminalReader {
 		int _startTop;
-		int _startBottom;
+		int _startLeft;
 		int _cursorOffset;
 		string _acc;
 		int _currentCommandHistoryIndex;
@@ -24,7 +24,7 @@ namespace ModernTerminal3 {
 			NativeConsoleOperation.OutConsoleMode = ConsoleOutMode.ENABLE_VIRTUAL_TERMINAL_PROCESSING | ConsoleOutMode.ENABLE_PROCESSED_OUTPUT | ConsoleOutMode.ENABLE_WRAP_AT_EOL_OUTPUT;
 			NativeConsoleOperation.InConsoleMode = 0;
 
-			(_startBottom, _startTop) = Console.GetCursorPosition();
+			(_startLeft, _startTop) = Console.GetCursorPosition();
 
 			bool running = true;
 
@@ -99,7 +99,10 @@ namespace ModernTerminal3 {
 		}
 
 		private void ReprintInput(string lastInput, string newInput) {
-			Console.SetCursorPosition(_startBottom, _startTop);
+			int width = Console.BufferWidth;
+			int height = Console.BufferHeight;
+			Console.SetCursorPosition(_startLeft, _startTop);
+
 			Console.Write(newInput[0.._cursorOffset]);
 
 			(int endCursorLeft, int endCursorTop) = Console.GetCursorPosition();
@@ -114,6 +117,7 @@ namespace ModernTerminal3 {
 				}
 			}
 			Console.SetCursorPosition(endCursorLeft, endCursorTop);
+			_startTop -= Math.Max(((_startLeft + newInput.Length - 1) / width) - (height - _startTop) + 1, 0);
 		}
 	}
 }
