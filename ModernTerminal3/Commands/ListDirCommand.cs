@@ -83,7 +83,7 @@ namespace ModernTerminal3.Commands {
 		}
 
 		private string FormatDate(DateTime dateTime) {
-			return DateTime.Now.ToString("dd MMM yyyy");
+			return dateTime.ToString("dd MMM yyyy");
 		}
 	}
 }
