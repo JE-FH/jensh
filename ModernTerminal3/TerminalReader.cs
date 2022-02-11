@@ -13,16 +13,18 @@ namespace ModernTerminal3 {
 		string _acc;
 		int _currentCommandHistoryIndex;
 		ITerminalReaderInfoProvider _terminalReaderInfoProvider;
-		public TerminalReader(ITerminalReaderInfoProvider terminalReaderInfoProvider) {
+		private INativeConsole nativeConsole;
+		public TerminalReader(ITerminalReaderInfoProvider terminalReaderInfoProvider, INativeConsole nativeConsole) {
 			_terminalReaderInfoProvider = terminalReaderInfoProvider;
+			this.nativeConsole = nativeConsole;
 		}
 
 		public string ReadLine() {
-			int oldInMode = NativeConsoleOperation.InConsoleMode;
-			int oldOutMode = NativeConsoleOperation.OutConsoleMode;
+			ConsoleInMode oldInMode = nativeConsole.InMode;
+			ConsoleOutMode oldOutMode = nativeConsole.OutMode;
 
-			NativeConsoleOperation.OutConsoleMode = ConsoleOutMode.ENABLE_VIRTUAL_TERMINAL_PROCESSING | ConsoleOutMode.ENABLE_PROCESSED_OUTPUT | ConsoleOutMode.ENABLE_WRAP_AT_EOL_OUTPUT;
-			NativeConsoleOperation.InConsoleMode = 0;
+			nativeConsole.OutMode = ConsoleOutMode.EnableEscapeSequences | ConsoleOutMode.ProcessedOutput | ConsoleOutMode.WrapAtEolOutput;
+			nativeConsole.InMode = ConsoleInMode.None;
 
 			(_startLeft, _startTop) = Console.GetCursorPosition();
 
@@ -93,8 +95,8 @@ namespace ModernTerminal3 {
 
 			Console.WriteLine();
 
-			NativeConsoleOperation.InConsoleMode = oldInMode;
-			NativeConsoleOperation.OutConsoleMode = oldOutMode;
+			nativeConsole.InMode = oldInMode;
+			nativeConsole.OutMode = oldOutMode;
 			return _acc;
 		}
 

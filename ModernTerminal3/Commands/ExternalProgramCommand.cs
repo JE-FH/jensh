@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,8 +10,11 @@ using System.Threading.Tasks;
 namespace ModernTerminal3.Commands {
 	class ExternalProgramCommand : ICommandHandler {
 		public string CommandName => "EPC";
+		private IPathProvider pathProvider;
 
-		public ExternalProgramCommand() { }
+		public ExternalProgramCommand(IPathProvider pathProvider) {
+			this.pathProvider = pathProvider;
+		}
 
 		public int CommandCalled(string command_name, string[] arguments) {
 			if (arguments.Length < 1) {
@@ -22,7 +26,7 @@ namespace ModernTerminal3.Commands {
 			for (int i = 1; i < arguments.Length; i++) {
 				real_arguments.Add(arguments[i]);
 			}
-			string[] possible_paths = null;
+			IEnumerable<string> possible_paths = null;
 
 			if (Path.IsPathRooted(arguments[0])) {
 				possible_paths = new string[] { arguments[0] };
@@ -30,7 +34,7 @@ namespace ModernTerminal3.Commands {
 				possible_paths = GetPossiblePaths(arguments[0]);
 			}
 
-			var first_executeable = FindFirstExecuteable(possible_paths, GetPossibleExtensions());
+			var first_executeable = FindFirstExecutable(possible_paths, GetPossibleExtensions());
 			if (first_executeable == null) {
 				first_executeable = arguments[0];
 			}
@@ -48,14 +52,14 @@ namespace ModernTerminal3.Commands {
 			e.Cancel = true;
 		}
 
-		string FindFirstExecuteable(string[] possible_paths, string[] possible_extensions) {
-			foreach (string path in possible_paths) {
-				if (File.Exists(path)) {
+		string FindFirstExecutable(IEnumerable<string> possiblePaths, IEnumerable<string> possibleExtensions) {
+			foreach (string path in possiblePaths) {
+				if (pathProvider.CanBeExecutable(path)) {
 					return path;
 				}
-				foreach (string extension in possible_extensions) {
+				foreach (string extension in possibleExtensions) {
 					string full = path + extension;
-					if (File.Exists(full)) {
+					if (pathProvider.CanBeExecutable(full)) {
 						return path;
 					}
 				}
@@ -63,29 +67,12 @@ namespace ModernTerminal3.Commands {
 			return null;
 		}
 
-		string[] GetPossiblePaths(string relative_path) {
-			//Maybe this should be cached since environment variables dont change
-			string raw_paths = Environment.GetEnvironmentVariable("Path");
-			if (raw_paths == null) {
-				throw new Exception("Path environment variable is not defined");
-			}
-
-			var paths = raw_paths.Split(Path.PathSeparator);
-			List<string> rv = new();
-			rv.Add(relative_path);
-			foreach (string path in paths) {
-				rv.Add(Path.Join(path, relative_path));
-			}
-			return rv.ToArray();
+		IEnumerable<string> GetPossiblePaths(string relativePath) {
+			return this.pathProvider.GetSearchPaths(relativePath);
 		}
 
-		string[] GetPossibleExtensions() {
-			string raw_extension = Environment.GetEnvironmentVariable("PATHEXT");
-			if (raw_extension == null) {
-				throw new Exception("PATHEXT environment variable is not defined");
-			}
-
-			return raw_extension.Split(";");
+		IEnumerable<string> GetPossibleExtensions() {
+			return this.pathProvider.GetExecutableExtensions();
 		}
 	}
 }

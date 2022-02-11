@@ -1,11 +1,25 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace ModernTerminal3 {
 	internal class Program {
 		static void Main(string[] args) {
-			Terminal terminal = new();
+			INativeConsole nativeConsole;
+			IPathProvider pathProvider;
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+				nativeConsole = new LinuxNativeConsole();
+				pathProvider = new LinuxPathProvider();
+			} else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+				nativeConsole = new WindowsNativeConsole();
+				pathProvider = new WindowsPathProvider();
+			} else {
+				Console.WriteLine("Unsupported platform");
+				return;
+			}
+			
+			var terminal = new Terminal(nativeConsole);
 
-			terminal.DefaultCommandHandler = new Commands.ExternalProgramCommand();
+			terminal.DefaultCommandHandler = new Commands.ExternalProgramCommand(pathProvider);
 
 			terminal.AddCommand(new Commands.EchoCommand());
 			terminal.AddCommand(new Commands.ListDirCommand());

@@ -23,9 +23,10 @@ namespace ModernTerminal3 {
 		List<IWorkEnvironment> WorkEnvironments;
 		HashSet<char> escapeableCharacters;
 		List<string> _commandHistory;
+		private INativeConsole nativeConsole;
 		public ICommandHandler DefaultCommandHandler { get; set; }
 
-		public Terminal() {
+		public Terminal(INativeConsole nativeConsole) {
 			commands = new Dictionary<string, ICommandHandler>();
 			WorkEnvironments = new List<IWorkEnvironment>();
 			escapeableCharacters = new HashSet<char>();
@@ -33,6 +34,7 @@ namespace ModernTerminal3 {
 			escapeableCharacters.Add('\\');
 			escapeableCharacters.Add(' ');
 			_commandHistory = new List<string>();
+			this.nativeConsole = nativeConsole;
 		}
 
 		public void Run() {
@@ -42,7 +44,7 @@ namespace ModernTerminal3 {
 
 				PrintPrompt();
 
-				TerminalReader commandLineReader = new TerminalReader(this);
+				TerminalReader commandLineReader = new TerminalReader(this, nativeConsole);
 				var input = commandLineReader.ReadLine();
 
 
@@ -62,8 +64,8 @@ namespace ModernTerminal3 {
 		}
 
 		private void SetCorrectConsoleMode() {
-			NativeConsoleOperation.OutConsoleMode = ConsoleInMode.ENABLE_PROCESSED_INPUT | ConsoleInMode.ENABLE_ECHO_INPUT;
-			NativeConsoleOperation.SetOutputConsoleCP(65001);
+			nativeConsole.InMode = ConsoleInMode.ProcessedInput | ConsoleInMode.EchoInput;
+			nativeConsole.SetOutputCodePage(65001);
 		}
 
 		private void PrintPrompt() {
