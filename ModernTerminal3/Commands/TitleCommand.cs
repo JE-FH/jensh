@@ -9,9 +9,9 @@ namespace ModernTerminal3.Commands {
 		public string CommandName => "title";
 		public TitleCommand() {}
 
-		public int CommandCalled(string command_name, string[] arguments) {
+		public int CommandCalled(TerminalEnvironment terminalEnvironment, string command_name, string[] arguments) {
 			if (arguments.Length != 1) {
-				Console.WriteLine("Expected atleast 1 argumnent");
+				terminalEnvironment.OutStream.WriteLine("Expected atleast 1 argumnent");
 				return 1;
 			}
 

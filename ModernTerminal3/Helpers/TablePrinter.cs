@@ -12,7 +12,7 @@ namespace ModernTerminal3.Helpers {
 			spacing = _spacing;
 		}
 
-		public void PrintTable(PrintableTableDescription tableDesc, IPrintableTableRow[] rows) {
+		public void PrintTable(IJenshOutStream target, PrintableTableDescription tableDesc, IPrintableTableRow[] rows) {
 
 			List<int> columnsLengths = new();
 
@@ -35,33 +35,33 @@ namespace ModernTerminal3.Helpers {
 
 			for (int i = 0; i < tableDesc.ColumnHeaders.Length; i++) {
 				if (i > 0) {
-					Console.Write(new string(' ', spacing));
+					target.Write(new string(' ', spacing));
 				}
-				Console.Write(tableDesc.ColumnHeaders[i].Data);
-				Console.Write(new string(' ', columnsLengths[i] - tableDesc.ColumnHeaders[i].RealLength));
+				target.Write(tableDesc.ColumnHeaders[i].Data);
+				target.Write(new string(' ', columnsLengths[i] - tableDesc.ColumnHeaders[i].RealLength));
 			}
 
-			Console.WriteLine();
+			target.WriteLine("");
 
 			for (int i = 0; i < tableDesc.ColumnHeaders.Length; i++) {
 				if (i > 0) {
-					Console.Write(new string(' ', spacing));
+					target.Write(new string(' ', spacing));
 				}
-				Console.Write(new string('-', columnsLengths[i]));
+				target.Write(new string('-', columnsLengths[i]));
 			}
 
-			Console.WriteLine();
+			target.WriteLine("");
 
 			foreach (IPrintableTableRow row in rows) {
 				EscapeCodeString[] rowColumns = row.GetStylizedColumns();
 				for (int i = 0; i < rowColumns.Length; i++) {
 					if (i > 0) {
-						Console.Write(new string(' ', spacing));
+						target.Write(new string(' ', spacing));
 					}
-					Console.Write(rowColumns[i].Data);
-					Console.Write(new string(' ', columnsLengths[i] - rowColumns[i].RealLength));
+					target.Write(rowColumns[i].Data);
+					target.Write(new string(' ', columnsLengths[i] - rowColumns[i].RealLength));
 				}
-				Console.WriteLine();
+				target.WriteLine("");
 			}
 
 		}

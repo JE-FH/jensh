@@ -46,7 +46,7 @@ namespace ModernTerminal3.Commands {
 	class ListDirCommand : ICommandHandler {
 		public string CommandName => "ls";
 
-		public int CommandCalled(string command_name, string[] arguments) {
+		public int CommandCalled(TerminalEnvironment terminalEnvironment, string command_name, string[] arguments) {
 			var dirInfo = new DirectoryInfo(Environment.CurrentDirectory);
 			List<FileSystemEntryData> entries = new();
 
@@ -78,7 +78,7 @@ namespace ModernTerminal3.Commands {
 			});
 
 			TablePrinter tablePrinter = new(2);
-			tablePrinter.PrintTable(printableTableDescription, entries.ToArray());
+			tablePrinter.PrintTable(terminalEnvironment.OutStream, printableTableDescription, entries.ToArray());
 			return 0;
 		}
 

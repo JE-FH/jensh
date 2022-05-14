@@ -28,6 +28,7 @@ namespace ModernTerminal3 {
 			terminal.AddCommand(new Commands.ExplainCommand());
 			terminal.AddCommand(new Commands.DelCommand());
 			terminal.AddCommand(new Commands.TitleCommand());
+			terminal.AddCommand(new Commands.ExitCommand());
 			terminal.AddWorkEnvironment(new WorkEnvironment.GitWorkEnvironment());
 			terminal.Run();
 		}

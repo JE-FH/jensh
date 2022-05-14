@@ -112,18 +112,23 @@ namespace ModernTerminal3 {
 		int HandleCommand(string command_name, string[] args) {
 			bool found = commands.TryGetValue(command_name, out ICommandHandler handler);
 			try {
+				var te = new TerminalEnvironment(
+					new TextInStream(Console.In, true),
+					new TextOutStream(Console.Out, true),
+					new TextOutStream(Console.Error, true)
+				);
 				if (found) {
-					return handler.CommandCalled(command_name, args);
+					return handler.CommandCalled(te, command_name, args);
 				} else {
-					return CallExternalProgram(command_name, args);
+					return CallExternalProgram(te, command_name, args);
 				}
 			} catch (Win32Exception e) {
 				Console.WriteLine($"({e.NativeErrorCode}) {e.Message}");
 				return 1;
 			}
 		}
-		int CallExternalProgram(string command_name, string[] args) {
-			return DefaultCommandHandler.CommandCalled(command_name, (new string[] { command_name }).Concat(args).ToArray());
+		int CallExternalProgram(TerminalEnvironment terminalEnvironment, string command_name, string[] args) {
+			return DefaultCommandHandler.CommandCalled(terminalEnvironment, command_name, (new string[] { command_name }).Concat(args).ToArray());
 		}
 
 		CommandSplitInfo[] SplitCommand(string command_input) {

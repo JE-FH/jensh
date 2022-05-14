@@ -13,9 +13,9 @@ namespace ModernTerminal3.Commands {
 
 		}
 
-		public int CommandCalled(string command_name, string[] arguments) {
+		public int CommandCalled(TerminalEnvironment terminalEnvironment, string command_name, string[] arguments) {
 			if (arguments.Length < 1) {
-				Console.WriteLine("Expected atleast 1 argument");
+				terminalEnvironment.ErrStream.WriteLine("Expected atleast 1 argument");
 				return 1;
 			}
 
@@ -27,7 +27,7 @@ namespace ModernTerminal3.Commands {
 				}
 				return 0;
 			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
+				terminalEnvironment.ErrStream.WriteLine(ex.Message);
 				return 1;
 			}
 		}

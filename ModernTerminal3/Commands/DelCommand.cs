@@ -15,7 +15,7 @@ namespace ModernTerminal3.Commands {
 		}
 
 
-		public int CommandCalled(string command_name, string[] _arguments) {
+		public int CommandCalled(TerminalEnvironment terminalEnvironment, string command_name, string[] _arguments) {
 			List<string> arguments = new List<string>(_arguments);
 
 			HashSet<char> switches = new HashSet<char>();
@@ -31,7 +31,7 @@ namespace ModernTerminal3.Commands {
 			}
 
 			if (arguments.Count < 1) {
-				Console.WriteLine("No targets specified");
+				terminalEnvironment.ErrStream.WriteLine("No targets specified");
 				return 1;
 			}
 
@@ -43,7 +43,7 @@ namespace ModernTerminal3.Commands {
 					File.Delete(targetPath);
 				}
 			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
+				terminalEnvironment.ErrStream.WriteLine(ex.Message);
 				return 1;
 			}
 			return 0;

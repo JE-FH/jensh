@@ -16,9 +16,9 @@ namespace ModernTerminal3.Commands {
 			this.pathProvider = pathProvider;
 		}
 
-		public int CommandCalled(string command_name, string[] arguments) {
+		public int CommandCalled(TerminalEnvironment terminalEnvironment, string command_name, string[] arguments) {
 			if (arguments.Length < 1) {
-				Console.WriteLine("Expected atleast 1 argument");
+				terminalEnvironment.ErrStream.WriteLine("Expected atleast 1 argument");
 				return 1;
 			}
 
@@ -39,8 +39,25 @@ namespace ModernTerminal3.Commands {
 				first_executeable = arguments[0];
 			}
 
-			var proc = Process.Start(first_executeable, real_arguments);
+			var proc = new Process();
+			proc.StartInfo.FileName = first_executeable;
+			foreach (var arg in real_arguments) {
+				proc.StartInfo.ArgumentList.Add(arg);
+			}
 			Console.CancelKeyPress += Console_IgnoreCancelKey;
+			
+			if (!terminalEnvironment.OutStream.IsNativeConsole())
+				proc.StartInfo.RedirectStandardOutput = true;
+			if (!terminalEnvironment.ErrStream.IsNativeConsole())
+				proc.StartInfo.RedirectStandardError = true;
+			if (!terminalEnvironment.InStream.IsNativeConsole())
+				proc.StartInfo.RedirectStandardInput = true;
+
+			proc.Start();
+
+			if (!terminalEnvironment.InStream.IsNativeConsole())
+				proc.StandardInput.Write(terminalEnvironment.InStream.ReadToEnd());
+
 			proc.WaitForExit();
 			while (Console.KeyAvailable)
 				Console.ReadKey(true);

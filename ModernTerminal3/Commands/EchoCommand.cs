@@ -10,14 +10,14 @@ namespace ModernTerminal3.Commands {
 
 		public EchoCommand() { }
 
-		public int CommandCalled(string command_name, string[] arguments) {
+		public int CommandCalled(TerminalEnvironment terminalEnvironment, string command_name, string[] arguments) {
 			for (int i = 0; i < arguments.Length; i++) {
-				Console.Write(arguments[i]);
+				terminalEnvironment.OutStream.Write(arguments[i]);
 				if (i < arguments.Length - 1) {
-					Console.Write(" ");
+					terminalEnvironment.OutStream.Write(" ");
 				}
 			}
-			Console.WriteLine();
+			terminalEnvironment.OutStream.WriteLine("");
 			return 0;
 		}
 	}
